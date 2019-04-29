@@ -8,3 +8,5 @@
 3. 若有一些希望我做出来的效果, 欢迎提issue
 4. 若发现BUG, 欢迎提issue
 5. 若写了一些好的view等等, 欢迎push request
+## 许可证
+* Apache License 2.0
