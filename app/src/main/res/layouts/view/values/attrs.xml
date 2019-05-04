@@ -15,8 +15,31 @@
         <attr name="banner" />
     </declare-styleable>
 
+    <!-- BulgingIconBottomNavigationView -->
+    <declare-styleable name="BulgingIconBottomNavigationView">
+        <attr name="icon" />
+        <attr name="divider" format="boolean" />
+        <attr name="dividerColor" format="color" />
+    </declare-styleable>
+
+    <!-- TabItem -->
+    <declare-styleable name="TabItem">
+        <attr name="title" />
+        <attr name="textCheckedColor" format="color" />
+        <attr name="textUnCheckedColor" format="color" />
+
+        <attr name="iconUnChecked" format="reference" />
+        <attr name="iconChecked" format="reference" />
+
+        <attr name="isChecked" format="boolean" />
+    </declare-styleable>
+
     <!-- general attr usage -->
     <attr name="title" format="string" />
     <attr name="subTitle" format="string" />
     <attr name="banner" format="reference" />
+    <attr name="iconHeight" format="dimension" />
+    <attr name="iconWidth" format="dimension" />
+    <attr name="icon" format="reference" />
+
 </resources>
