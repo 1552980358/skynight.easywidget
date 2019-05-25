@@ -1,9 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="WaterfallScrollView" >
+    <!-- WaterfallScrollView -->
+    <declare-styleable name="WaterfallScrollView">
         <!-- maximum number of LinearLayout, default 2 -->
-        <attr name="linearMax" format="integer"/>
+        <attr name="linearMax" format="integer" />
         <!-- bottom view for custom use, default gone  -->
         <attr name="bottomView" format="reference" />
     </declare-styleable>
+
+    <!-- WaterfallCardViewItem -->
+    <declare-styleable name="WaterfallCardViewItem">
+        <attr name="title" />
+        <attr name="subTitle" />
+        <attr name="banner" />
+    </declare-styleable>
+
+    <!-- BulgingIconBottomNavigationView -->
+    <declare-styleable name="BulgingIconBottomNavigationView">
+        <attr name="icon" />
+        <attr name="divider" format="boolean" />
+        <attr name="dividerColor" format="color" />
+    </declare-styleable>
+
+    <!-- TabItem -->
+    <declare-styleable name="TabItem">
+        <attr name="title" />
+        <attr name="textCheckedColor" format="color" />
+        <attr name="textUnCheckedColor" format="color" />
+
+        <attr name="iconUnChecked" format="reference" />
+        <attr name="iconChecked" format="reference" />
+
+        <attr name="isChecked" format="boolean" />
+    </declare-styleable>
+
+    <!-- general attr usage -->
+    <attr name="title" format="string" />
+    <attr name="subTitle" format="string" />
+    <attr name="banner" format="reference" />
+    <attr name="iconHeight" format="dimension" />
+    <attr name="iconWidth" format="dimension" />
+    <attr name="icon" format="reference" />
+
 </resources>

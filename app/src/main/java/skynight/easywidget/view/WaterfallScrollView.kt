@@ -1,16 +1,24 @@
+@file:Suppress("unused")
+
 package skynight.easywidget.view
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.Icon
+import android.net.Uri
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import kotlinx.android.synthetic.main.item_waterfallcardview.view.*
 
 import kotlinx.android.synthetic.main.view_waterfallscroll.view.*
-
 import skynight.easywidget.R
+
 import java.lang.Exception
 
 /*
@@ -36,18 +44,21 @@ class WaterfallScrollView : LinearLayout {
 
         if (attributeSet != null) {
             // When attributeSet isn't null
-            val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.WaterfallScrollView)
-            linearLayoutMAX = typedArray.getInt(R.styleable.WaterfallScrollView_linearMax, 2) // Default 2
+            // refers to /res/layouts/view/values/attrs.xml
+            val typedArray =
+                context.obtainStyledAttributes(attributeSet, R.styleable.WaterfallScrollView)
+            linearLayoutMAX =
+                typedArray.getInt(R.styleable.WaterfallScrollView_linearMax, 2) // Default 2
             setLinearLayoutMax(linearLayoutMAX)
 
             if (typedArray.hasValue(R.styleable.WaterfallScrollView_bottomView)) {
                 bottomActionView.visibility = View.VISIBLE
-                bottomView = LayoutInflater
-                        .from(context)
-                        .inflate(typedArray.getResourceId(
-                                R.styleable.WaterfallScrollView_bottomView,
-                                0 // whatever you want, that is reachless
-                        ), null)
+                bottomView = LayoutInflater.from(context).inflate(
+                        typedArray.getResourceId(
+                            R.styleable.WaterfallScrollView_bottomView,
+                            0 // whatever you want, that is reachless
+                        ), null
+                    )
                 bottomActionView.addView(bottomView)
             }
 
@@ -83,6 +94,7 @@ class WaterfallScrollView : LinearLayout {
                 layoutParams.weight = 1f
                 linearLayout.layoutParams = layoutParams
                 linearLayoutList.add(linearLayout) // 添加
+                root.addView(linearLayout)
             }
         }
     }
@@ -220,5 +232,126 @@ class WaterfallScrollView : LinearLayout {
     override fun addView(view: View) {
         linearLayoutList[viewCount % linearLayoutMAX].addView(view)
         viewCount++
+    }
+
+    class WaterfallCardViewItem : LinearLayout {
+        constructor(context: Context) : this(context, attributeSet = null)
+        constructor(context: Context, attributeSet: AttributeSet?) : super(context, attributeSet) {
+            LayoutInflater.from(context).inflate(R.layout.item_waterfallcardview, this)
+            if (attributeSet != null) {
+
+            }
+        }
+
+        /*
+         * Set Title
+         *
+         * @param Int
+         *
+         * @param CharSequence
+         *
+         * return WaterfallCardViewItem
+         *
+         * */
+        @Suppress("unused")
+        fun setTitle(resId: Int): WaterfallCardViewItem {
+            return this.setTitle(context.getString(resId))
+        }
+        @Suppress("MemberVisibilityCanBePrivate")
+        fun setTitle(t: CharSequence): WaterfallCardViewItem {
+            title.text = t
+            return this
+        }
+
+        /*
+         * Set Sub Title
+         *
+         * @param Int
+         *
+         * @param CharSequence
+         *
+         * return WaterfallCardViewItem
+         *
+         * */
+        @Suppress("unused")
+        fun setSubTitle(resId: Int): WaterfallCardViewItem {
+            return this.setSubTitle(context.getString(resId))
+        }
+        @Suppress("MemberVisibilityCanBePrivate")
+        fun setSubTitle(s: CharSequence): WaterfallCardViewItem {
+            subTitle.text = s
+            return this
+        }
+
+        /*
+         * Hide title / sub title
+         *
+         * @return WaterfallCardViewItem
+         * */
+        fun hideTitle(): WaterfallCardViewItem {
+            title.visibility = View.GONE
+            return this
+        }
+        fun hideSubTitle(): WaterfallCardViewItem {
+            subTitle.visibility = View.GONE
+            return this
+        }
+
+        /*
+         * Set image over text
+         *
+         * @param Drawable
+         *
+         * @param Int
+         *
+         * @param Bitmap
+         *
+         * @param String
+         *
+         * @param Icon (for SDK23+)
+         *
+         * @return WaterfallCardViewItem
+         *
+         * */
+        fun setBanner(drawable: Drawable): WaterfallCardViewItem {
+            banner.setImageDrawable(drawable)
+            return this
+        }
+        fun setBanner(resId: Int): WaterfallCardViewItem {
+            banner.setImageResource(resId)
+            return this
+        }
+        fun setBanner(bitmap: Bitmap): WaterfallCardViewItem {
+            banner.setImageBitmap(bitmap)
+            return this
+        }
+        fun setBanner(uri: String): WaterfallCardViewItem {
+            return this.setBanner(Uri.parse(uri))
+        }
+        @Suppress("MemberVisibilityCanBePrivate")
+        fun setBanner(uri: Uri): WaterfallCardViewItem {
+            banner.setImageURI(uri)
+            return this
+        }
+        fun setBanner(icon: Icon): WaterfallCardViewItem {
+            if (Build.VERSION.SDK_INT >= 23) {
+                banner.setImageIcon(icon)
+            } else {
+                throw Exception("API23+ Required")
+            }
+            return this
+        }
+
+        /*
+         * Set OnClickListener on item
+         *
+         * @param OnClickListener
+         *
+         * @return void
+         *
+         * */
+        override fun setOnClickListener(l: OnClickListener) {
+            itemRoot.setOnClickListener(l)
+        }
     }
 }
