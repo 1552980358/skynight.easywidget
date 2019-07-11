@@ -1,0 +1,20 @@
+package skynight.easywidget
+
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_compassclockview.*
+
+/**
+ * @FILE:   CompassClockActivity
+ * @AUTHOR: 1552980358
+ * @DATE:   11 Jul 2019
+ * @TIME:   5:40 PM
+ **/
+
+class CompassClockActivity: AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_compassclockview)
+        setSupportActionBar(toolbar)
+    }
+}

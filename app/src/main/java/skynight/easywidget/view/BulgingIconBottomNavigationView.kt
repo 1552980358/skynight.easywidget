@@ -91,9 +91,9 @@ class BulgingIconBottomNavigationView : LinearLayout {
             if (typedArray.hasValue(R.styleable.BulgingIconBottomNavigationView_icon)) {
                 floatingActionButton.setImageDrawable(typedArray.getDrawable(R.styleable.BulgingIconBottomNavigationView_icon))
             }
-            if (typedArray.hasValue(R.styleable.BulgingIconBottomNavigationView_divider)) {
+            if (typedArray.hasValue(R.styleable.BulgingIconBottomNavigationView_divide)) {
                 divider.visibility = if (typedArray.getBoolean(
-                        R.styleable.BulgingIconBottomNavigationView_divider, false
+                        R.styleable.BulgingIconBottomNavigationView_divide, false
                     )
                 ) {
                     View.VISIBLE
@@ -101,10 +101,10 @@ class BulgingIconBottomNavigationView : LinearLayout {
                     View.GONE
                 }
             }
-            if (typedArray.hasValue(R.styleable.BulgingIconBottomNavigationView_dividerColor)) {
+            if (typedArray.hasValue(R.styleable.BulgingIconBottomNavigationView_divideColor)) {
                 divider.setBackgroundColor(
                     typedArray.getColor(
-                        R.styleable.BulgingIconBottomNavigationView_dividerColor,
+                        R.styleable.BulgingIconBottomNavigationView_divideColor,
                         ContextCompat.getColor(context, android.R.color.darker_gray)
                     )
                 )

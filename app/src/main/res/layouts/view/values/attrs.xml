@@ -18,8 +18,8 @@
     <!-- BulgingIconBottomNavigationView -->
     <declare-styleable name="BulgingIconBottomNavigationView">
         <attr name="icon" />
-        <attr name="divider" format="boolean" />
-        <attr name="dividerColor" format="color" />
+        <attr name="divide" format="boolean" />
+        <attr name="divideColor" format="color" />
     </declare-styleable>
 
     <!-- TabItem -->
