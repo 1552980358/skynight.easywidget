@@ -1,6 +1,9 @@
 package skynight.easywidget.view
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -60,9 +63,9 @@ class CompassClockView : View {
     private var centY: Float = 0.toFloat()
 
     //默认字体大小15centX
-    private var textSize = 18f
+    private var textSize = 0f
     //默认字体间距5centX
-    private var textSpacing = 5f
+    private var textMargin = 5f
 
     companion object {
         const val MONTH = "月"
@@ -118,27 +121,83 @@ class CompassClockView : View {
         dayCount = cal.get(Calendar.DAY_OF_MONTH)
 
         Thread {
+/*
             while (true) {
                 try {
                     Thread.sleep(20)
-                    if (yuan != 360f) {
-                        yuan++
-                    } else {
-                        year = TimeUtils.getCurTimeString(SimpleDateFormat("yyyy", Locale.getDefault())
-                        ).toInt()
-                        month = TimeUtils.getCurTimeString(SimpleDateFormat("MM", Locale.getDefault())).toInt()
-                        day = TimeUtils.getCurTimeString(SimpleDateFormat("dd", Locale.getDefault())).toInt()
-                        hr = TimeUtils.getCurTimeString(SimpleDateFormat("HH", Locale.getDefault())).toInt()
-                        min = TimeUtils.getCurTimeString(SimpleDateFormat("mm", Locale.getDefault())).toInt()
-                        sec = TimeUtils.getCurTimeString(SimpleDateFormat("ss", Locale.getDefault())).toInt()
-                        week = TimeUtils.getWeek()
-                    }
+                } catch (e: Exception) {
+                    //
+                }
+                if (yuan != 360f) {
+                    yuan++
                     postInvalidate()
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
+                } else {
+                    onTimeUpdate()
                 }
             }
+*/
+            while (yuan != 360f) {
+                try {
+                    Thread.sleep(20)
+                } catch (e: Exception) {
+                    //
+                }
+                yuan++
+                postInvalidate()
+            }
+            context.registerReceiver(TimeChangeReceiver(this), IntentFilter().also {
+                it.addAction(Intent.ACTION_TIME_TICK)
+                it.addAction(Intent.ACTION_DATE_CHANGED)
+            })
+
+            onTimeUpdate()
+            while (sec <= 59) {
+                try {
+                    Thread.sleep(20)
+                } catch (e: Exception) {
+                    //
+                }
+                onSecondUpdate()
+            }
+            return@Thread
         }.start()
+    }
+
+    fun onStartThreadTimeUpdate() {
+        Thread {
+            onTimeUpdate()
+            while (sec <= 59) {
+                try {
+                    Thread.sleep(20)
+                } catch (e: Exception) {
+                    //
+                }
+                onSecondUpdate()
+            }
+            try {
+                Thread.currentThread().interrupt()
+            } catch (e: Exception) {
+
+            }
+        }.start()
+    }
+
+    private fun onTimeUpdate() {
+        hr = TimeUtils.getCurTimeString(SimpleDateFormat("HH", Locale.getDefault())).toInt()
+        min = TimeUtils.getCurTimeString(SimpleDateFormat("mm", Locale.getDefault())).toInt()
+        week = TimeUtils.getWeek()
+        onSecondUpdate()
+    }
+
+    private fun onSecondUpdate() {
+        sec = TimeUtils.getCurTimeString(SimpleDateFormat("ss", Locale.getDefault())).toInt()
+        postInvalidate()
+    }
+
+    fun onDateUpdate() {
+        year = TimeUtils.getCurTimeString(SimpleDateFormat("yyyy", Locale.getDefault())).toInt()
+        month = TimeUtils.getCurTimeString(SimpleDateFormat("MM", Locale.getDefault())).toInt()
+        day = TimeUtils.getCurTimeString(SimpleDateFormat("dd", Locale.getDefault())).toInt()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -147,10 +206,14 @@ class CompassClockView : View {
         if (centX == 0f) centX = (width / 2).toFloat()
         if (centY == 0f) centY = (height / 2).toFloat()
 
+        if (textSize == 0f) {
+            setTextSize((if (centX > centY) centY else centX - textMargin * 6) / 27f)
+        }
+
         //绘制年
         canvas.drawText("二零一九年", centX, centY, paintSelect)
 
-        val monthLen = paintSelect.measureText("二零一九年") / 2 + centX + paintSelect.measureText(countTag[11] + MONTH) / 2 + textSpacing
+        val monthLen = paintSelect.measureText("二零一九年") / 2 + centX + paintSelect.measureText(countTag[11] + MONTH) / 2 + textMargin
 
         //绘制月
         canvas.save()
@@ -160,7 +223,7 @@ class CompassClockView : View {
         canvas.restore()
 
         //绘制日
-        val dayLen = monthLen + paintSelect.measureText(countTag[30] + DAY) / 2 + paintSelect.measureText(countTag[11] + MONTH) / 2 + textSpacing
+        val dayLen = monthLen + paintSelect.measureText(countTag[30] + DAY) / 2 + paintSelect.measureText(countTag[11] + MONTH) / 2 + textMargin
         canvas.save()
         dayDeg = getCircumference(dayCount, day, dayDeg)
         canvas.rotate(dayDeg, centX, centY)
@@ -168,7 +231,7 @@ class CompassClockView : View {
         canvas.restore()
 
         //绘制星期
-        val weekLen = dayLen + paintSelect.measureText(countTag[30] + DAY) / 2 + paintSelect.measureText(WEEK + countTag[0]) / 2 + textSpacing
+        val weekLen = dayLen + paintSelect.measureText(countTag[30] + DAY) / 2 + paintSelect.measureText(WEEK + countTag[0]) / 2 + textMargin
         canvas.save()
         weekDeg = getCircumference(7, week, weekDeg)
         canvas.rotate(weekDeg, centX, centY)
@@ -176,7 +239,7 @@ class CompassClockView : View {
         canvas.restore()
 
         //绘制时
-        val hrLen = weekLen + paintSelect.measureText(countTag[23] + HOUR) / 2 + paintSelect.measureText(WEEK + countTag[0]) / 2 + textSpacing
+        val hrLen = weekLen + paintSelect.measureText(countTag[23] + HOUR) / 2 + paintSelect.measureText(WEEK + countTag[0]) / 2 + textMargin
         canvas.save()
         hrDeg = getCircumference(24, hr, hrDeg)
         canvas.rotate(hrDeg, centX, centY)
@@ -184,7 +247,7 @@ class CompassClockView : View {
         canvas.restore()
 
         //绘制分
-        val minLen = hrLen + paintSelect.measureText(countTag[23] + HOUR) / 2 + paintSelect.measureText(countTag[58] + MINUTE) / 2 + textSpacing
+        val minLen = hrLen + paintSelect.measureText(countTag[23] + HOUR) / 2 + paintSelect.measureText(countTag[58] + MINUTE) / 2 + textMargin
         canvas.save()
         minDeg = getCircumference(60, min, minDeg)
         canvas.rotate(minDeg, centX, centY)
@@ -192,7 +255,7 @@ class CompassClockView : View {
         canvas.restore()
 
         //绘制秒
-        val secLen = minLen + paintSelect.measureText(countTag[58] + MINUTE) / 2 + paintSelect.measureText(countTag[58] + MINUTE) / 2 + textSpacing
+        val secLen = minLen + paintSelect.measureText(countTag[58] + MINUTE) / 2 + paintSelect.measureText(countTag[58] + MINUTE) / 2 + textMargin
         canvas.save()
         secDeg = getCircumference(60, sec, secDeg)
         canvas.rotate(secDeg, centX, centY)
@@ -233,8 +296,8 @@ class CompassClockView : View {
 
     //设置不同单位之间的距离
     @Suppress("unused")
-    fun setTextSpacing(textSpacing: Float) {
-        this.textSpacing = textSpacing
+    fun setTextMargin(textMargin: Float) {
+        this.textMargin = textMargin
     }
 
     // 设置选中颜色
@@ -248,6 +311,15 @@ class CompassClockView : View {
     fun setTextColorNotSelected(color: Int) {
         this.textColorNotSelected = color
         paint.color = textColorNotSelected
+    }
+
+    internal class TimeChangeReceiver(private val compassClockView: CompassClockView): BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent!!.action == Intent.ACTION_TIME_TICK) {
+                compassClockView.onDateUpdate()
+                compassClockView.onStartThreadTimeUpdate()
+            }
+        }
     }
 
     internal class TimeUtils private constructor() {
