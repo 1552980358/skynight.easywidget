@@ -4,11 +4,17 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.graphics.drawable.toBitmap
+import skynight.easywidget.view.CompassClockView.ImgUtils.Companion.drawable2bitmap
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -67,7 +73,10 @@ class CompassClockView : View {
     //默认字体间距5centX
     private var textMargin = 5f
 
+    private var bgColor: Int = -1
+
     companion object {
+        const val YEAR = "年"
         const val MONTH = "月"
         const val DAY = "日"
         const val WEEK = "星期"
@@ -95,14 +104,14 @@ class CompassClockView : View {
 
     init {
         paint = Paint().also {
-            it.color = Color.BLACK
+            it.color = textColorNotSelected
             it.isAntiAlias = true
             it.textSize = textSize
             it.textAlign = Paint.Align.CENTER
         }
 
         paintSelect = Paint().also {
-            it.color = Color.RED
+            it.color = textColorSelected
             it.isAntiAlias = true
             it.textSize = textSize
             it.textAlign = Paint.Align.CENTER
@@ -138,7 +147,7 @@ class CompassClockView : View {
 */
             while (yuan != 360f) {
                 try {
-                    Thread.sleep(20)
+                    Thread.sleep(5)
                 } catch (e: Exception) {
                     //
                 }
@@ -161,6 +170,7 @@ class CompassClockView : View {
             }
             return@Thread
         }.start()
+        setProp()
     }
 
     fun onStartThreadTimeUpdate() {
@@ -202,18 +212,29 @@ class CompassClockView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawColor(Color.WHITE)
+
+        try {
+            if (bgColor != -1) {
+                canvas.drawColor(bgColor)
+            } else {
+                    canvas.drawBitmap(drawable2bitmap(background), 0f, 0f, paint)
+            }
+        } catch (e: Exception) {
+            //
+        }
+
+
         if (centX == 0f) centX = (width / 2).toFloat()
         if (centY == 0f) centY = (height / 2).toFloat()
 
         if (textSize == 0f) {
-            setTextSize((if (centX > centY) centY else centX - textMargin * 6) / 27f)
+            setTextSize((if (centX > centY) centY else centX - textMargin * 6) / 25f)
         }
 
         //绘制年
-        canvas.drawText("二零一九年", centX, centY, paintSelect)
+        canvas.drawText(getYearAsString() + YEAR, centX, centY, paintSelect)
 
-        val monthLen = paintSelect.measureText("二零一九年") / 2 + centX + paintSelect.measureText(countTag[11] + MONTH) / 2 + textMargin
+        val monthLen = paintSelect.measureText(getYearAsString() + YEAR) / 2 + centX + paintSelect.measureText(countTag[11] + MONTH) / 2 + textMargin
 
         //绘制月
         canvas.save()
@@ -261,7 +282,29 @@ class CompassClockView : View {
         canvas.rotate(secDeg, centX, centY)
         onDrawContent(canvas, SECOND, 60, secLen, centY, sec - 1)
         canvas.restore()
+    }
 
+    private fun getYearAsString(): String {
+        val stringBuilder = StringBuilder()
+        year.toString().forEach {
+            stringBuilder.append(
+                when (it) {
+                    '0' -> "零"
+                    '1' -> "一"
+                    '2' -> "二"
+                    '3' -> "三"
+                    '4' -> "四"
+                    '5' -> "五"
+                    '6' -> "六"
+                    '7' -> "七"
+                    '8' -> "八"
+                    '9' -> "九"
+                    else -> throw Exception("ERROR ON YEAR")
+                }
+            )
+        }
+
+        return stringBuilder.toString()
     }
 
     private fun getCircumference(number: Int, arrive: Int, currentCircumference: Float): Float {
@@ -310,7 +353,37 @@ class CompassClockView : View {
     @Suppress("unused")
     fun setTextColorNotSelected(color: Int) {
         this.textColorNotSelected = color
-        paint.color = textColorNotSelected
+        paint.color = color
+    }
+
+    // 背景
+    @Suppress("unused")
+    fun setBackground(color: Int) {
+        setBackgroundColor(color)
+    }
+    @Suppress("unused")
+    fun setBackground(bitmap: Bitmap) {
+        background = BitmapDrawable(context.resources, bitmap)
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun setProp(unSelected: Int? = null, selected: Int? = null, bgColor: Int? = null, bgBitmap: Bitmap? = null, bgDrawable: Drawable? = null) {
+        unSelected?.let {
+            setTextColorNotSelected(it)
+        }
+        selected?.let {
+            setTextColorSelected(it)
+        }
+        bgColor?.let {
+            this.bgColor = it
+            setBackground(it)
+        }
+        bgBitmap?.let {
+            setBackground(it)
+        }
+        bgDrawable?.let {
+            background = it
+        }
     }
 
     internal class TimeChangeReceiver(private val compassClockView: CompassClockView): BroadcastReceiver() {
@@ -318,6 +391,18 @@ class CompassClockView : View {
             if (intent!!.action == Intent.ACTION_TIME_TICK) {
                 compassClockView.onDateUpdate()
                 compassClockView.onStartThreadTimeUpdate()
+            }
+        }
+    }
+
+    internal class ImgUtils private constructor() {
+        init {
+            throw Exception("PrivateConstructorNotAllowedToInitialize")
+        }
+
+        companion object {
+            fun drawable2bitmap(drawable: Drawable): Bitmap {
+                return drawable.toBitmap()
             }
         }
     }
