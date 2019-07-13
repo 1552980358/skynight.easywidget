@@ -217,7 +217,7 @@ class CompassClockView : View {
             if (bgColor != -1) {
                 canvas.drawColor(bgColor)
             } else {
-                    canvas.drawBitmap(drawable2bitmap(background), 0f, 0f, paint)
+                canvas.drawBitmap(drawable2bitmap(background), 0f, 0f, paint)
             }
         } catch (e: Exception) {
             //
@@ -360,10 +360,12 @@ class CompassClockView : View {
     @Suppress("unused")
     fun setBackground(color: Int) {
         setBackgroundColor(color)
+        postInvalidate()
     }
     @Suppress("unused")
     fun setBackground(bitmap: Bitmap) {
         background = BitmapDrawable(context.resources, bitmap)
+        postInvalidate()
     }
 
     @Suppress("MemberVisibilityCanBePrivate")

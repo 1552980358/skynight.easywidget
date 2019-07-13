@@ -1,6 +1,5 @@
 package skynight.easywidget
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_compassclockview.*
@@ -17,8 +16,5 @@ class CompassClockActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_compassclockview)
         setSupportActionBar(toolbar)
-        Color.BLACK
-        compassClockView.setProp(bgColor = Color.RED)
-        //compassClockView.setTextSize(14f)
     }
 }
