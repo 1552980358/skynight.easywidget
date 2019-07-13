@@ -348,12 +348,14 @@ class CompassClockView : View {
     fun setTextColorSelected(color: Int) {
         this.textColorSelected = color
         paintSelect.color = textColorSelected
+        postInvalidate()
     }
     // 设置未选中颜色
     @Suppress("unused")
     fun setTextColorNotSelected(color: Int) {
         this.textColorNotSelected = color
         paint.color = color
+        postInvalidate()
     }
 
     // 背景
